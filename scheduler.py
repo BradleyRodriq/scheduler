@@ -7,7 +7,7 @@ days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sun
 
 # Define guides with their maximum days of work per week
 guides_info = {
-    "amauri": {"max_days_per_week": 4},
+    "amauri": {"max_days_per_week": 5},
     "paola": {"max_days_per_week": 5},
     "bradley": {"max_days_per_week": 5},
     "rene": {"max_days_per_week": 3},
@@ -15,7 +15,7 @@ guides_info = {
     "danny": {"max_days_per_week": 5},
     "kathy": {"max_days_per_week": 5},
     "nixshia": {"max_days_per_week": 5},
-    "natalia": {"max_days_per_week": 5},
+    "natalia": {"max_days_per_week": 1},
 }
 
 # Initialize schedule
@@ -31,9 +31,10 @@ def can_work_more(guide):
     return scheduled_days < guides_info[guide]["max_days_per_week"]
 
 # Randomize schedule
+random_day = random.choice(days)
 for day in days:
     for shift in shifts:
-        if day == "Sunday" and shift in ["rf only 1", "rf only 2"]:
+        if random_day == "Sunday" and shift in ["rf only 1", "rf only 2"]:
             available_guides = [guide for guide in guides_info.keys() if is_guide_available(day, shift, guide) and can_work_more(guide)]
             if available_guides:
                 guide1 = random.choice(available_guides)
@@ -44,23 +45,29 @@ for day in days:
         else:
             available_guides = [guide for guide in guides_info.keys() if is_guide_available(day, shift, guide) and can_work_more(guide)]
             if available_guides:
-                # Specific conditions for each guide
-                if shift == "rfbb" and schedule[day][shift]["guide1"] is None:
-                    # Amauri can only work in rfbb guide 1
+                if shift == "rfbb" and schedule[random_day][shift]["guide1"] is None:
                     if "amauri" in available_guides:
                         guide1 = "amauri"
                         available_guides.remove("amauri")
                         guide2 = random.choice(available_guides)
                         schedule[day][shift]["guide1"] = guide1
                         schedule[day][shift]["guide2"] = guide2
-                elif shift == "rfbb" and schedule[day][shift]["guide1"] == "amauri":
-                    # Nixshia can cover the other rfbb guide 1 shift
-                    guide1 = "nixshia"
-                    available_guides.remove("nixshia")
-                    guide2 = random.choice(available_guides)
-                    schedule[day][shift]["guide1"] = guide1
-                    schedule[day][shift]["guide2"] = guide2
+                    elif "nixshia" in available_guides:
+                        guide1 = "nixshia"
+                        available_guides.remove("nixshia")
+                        guide2 = random.choice(available_guides)
+                        schedule[day][shift]["guide1"] = guide1
+                        schedule[day][shift]["guide2"] = guide2
                 elif shift == "rfbb" and schedule[day][shift]["guide1"] != "amauri":
+    # Nixshia always covers the other rfbb guide 1 shift when Amauri is not scheduled
+                    if "nixshia" in available_guides:
+                        guide1 = "nixshia"
+                        available_guides.remove("nixshia")
+                        guide2 = random.choice(available_guides)
+                        schedule[day][shift]["guide1"] = guide1
+                        schedule[day][shift]["guide2"] = guide2
+
+                elif shift != "rfbb" and schedule[day][shift]["guide1"] or schedule[day][shift]["guide2"]:
                     # Danny can work in rfbb other than guide 1
                     available_guides.remove("danny")
                     guide1 = "danny"
@@ -83,9 +90,10 @@ for day in days:
 
 # Print the schedule
 for day in days:
+    print()
     print(f"{day}")
     for shift in shifts:
-        print(f"{shift}:")
-        print(f"Guide 1: {schedule[day][shift]['guide1']}") 
-        print(f"Guide 2: {schedule[day][shift]['guide2']}")
-        print()
+        print(f"    {shift}:")
+        print(f"        Guide 1: {schedule[day][shift]['guide1']}") 
+        print(f"        Guide 2: {schedule[day][shift]['guide2']}")
+        
