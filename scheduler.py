@@ -1,92 +1,91 @@
 #!/usr/bin/python3
-
 import random
 
+# Define shifts and days
+shifts = ["rfbb", "rf1", "rf2"]
 days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-shifts_weekdays = ["RFBB", "RF1", "RF2"]
-shifts_sunday = ["RF Only 1", "RF Only 2"]
-guides = ["Amauri", "Paola", "Bradley", "Renee", "Jean", "Kathy", "Nixshia", "Natalia"]
 
-schedule = {day: {shift: {"Guide 1": "", "Guide 2": ""} for shift in shifts_weekdays} for day in days[:6]}
-schedule["Sunday"] = {shift: {"Guide 1": "", "Guide 2": ""} for shift in shifts_sunday}
+# Define guides with their maximum days of work per week
+guides_info = {
+    "amauri": {"max_days_per_week": 4},
+    "paola": {"max_days_per_week": 5},
+    "bradley": {"max_days_per_week": 5},
+    "rene": {"max_days_per_week": 3},
+    "jean": {"max_days_per_week": 5},
+    "danny": {"max_days_per_week": 5},
+    "kathy": {"max_days_per_week": 5},
+    "nixshia": {"max_days_per_week": 5},
+    "natalia": {"max_days_per_week": 5},
+}
 
-# Conditions
-amauri_days = 0
-bradley_days = 0
-paola_days = 0
-renee_days = 0
-jean_days = 0
-kathy_days = 0
-nixshia_days = 0
-natalia_days = 0
+# Initialize schedule
+schedule = {day: {shift: {"guide1": None, "guide2": None} for shift in shifts} for day in days}
 
-while True:
-    if (
-        amauri_days >= 4 and
-        bradley_days >= 5 and
-        paola_days >= 5 and
-        renee_days >= 3 and
-        jean_days >= 5 and
-        kathy_days >= 5 and
-        nixshia_days >= 5 and
-        natalia_days >= 1
-    ):
-        break
+# Helper function to check if a guide is available on a given day and shift
+def is_guide_available(day, shift, guide):
+    return schedule[day][shift]["guide1"] != guide and schedule[day][shift]["guide2"] != guide
 
-    random_day = random.choice(days)
-    
-    if random_day != "Sunday":
-        random_shift = random.choice(shifts_weekdays)
-    else:
-        random_shift = random.choice(shifts_sunday)
+# Helper function to check if a guide has reached the maximum days of work per week
+def can_work_more(guide):
+    scheduled_days = sum(1 for day in days for shift in shifts if schedule[day][shift]["guide1"] == guide or schedule[day][shift]["guide2"] == guide)
+    return scheduled_days < guides_info[guide]["max_days_per_week"]
 
-    assigned_guides = set()
-    assigned_guides.add(schedule[random_day][random_shift]["Guide 1"])
-    assigned_guides.add(schedule[random_day][random_shift]["Guide 2"])
-
-    available_guides = [guide for guide in guides if guide not in assigned_guides]
-
-    if available_guides:
-        guide = random.choice(available_guides)
-
-        if (
-            (guide == "Amauri" and amauri_days < 4 and random_shift == "RFBB" and schedule[random_day]['RFBB']["Guide 1"] == "") or
-            (guide == "Nixshia" and nixshia_days < 5 and random_shift == "RFBB" and schedule[random_day]['RFBB']["Guide 1"] == "") or
-            (guide == "Natalia" and natalia_days < 1 and random_day in ["Saturday", "Sunday"] and random_shift != "RFBB") or
-            (guide == "Bradley" and bradley_days < 5 and random_day != "Friday" and random_shift != "RFBB") or
-            (guide == "Paola" and paola_days < 5 and random_shift != "RFBB") or
-            (guide == "Renee" and renee_days < 3 and random_day in ["Sunday", "Monday", "Tuesday"] and random_shift != "RFBB") or
-            (guide == "Jean" and random_shift not in ["RFBB", "RF Only 1"])
-        ):
-            if random_shift == "RFBB" and schedule[random_day]['RFBB']["Guide 1"] == "":
-                schedule[random_day]['RFBB']["Guide 1"] = guide
-                if guide == "Amauri":
-                    amauri_days += 1
-                elif guide == "Nixshia":
-                    nixshia_days += 1
-            elif schedule[random_day][random_shift]["Guide 2"] == "":
-                schedule[random_day][random_shift]["Guide 2"] = guide
-
-            # Update days for each guide
-            if guide == "Bradley":
-                bradley_days += 1
-            elif guide == "Paola":
-                paola_days += 1
-            elif guide == "Renee":
-                renee_days += 1
-            elif guide == "Jean":
-                jean_days += 1
-            elif guide == "Kathy":
-                kathy_days += 1
-            elif guide == "Nixshia":
-                nixshia_days += 1
-            elif guide == "Natalia":
-                natalia_days += 1
+# Randomize schedule
+for day in days:
+    for shift in shifts:
+        if day == "Sunday" and shift in ["rf only 1", "rf only 2"]:
+            available_guides = [guide for guide in guides_info.keys() if is_guide_available(day, shift, guide) and can_work_more(guide)]
+            if available_guides:
+                guide1 = random.choice(available_guides)
+                available_guides.remove(guide1)
+                guide2 = random.choice(available_guides)
+                schedule[day][shift]["guide1"] = guide1
+                schedule[day][shift]["guide2"] = guide2
+        else:
+            available_guides = [guide for guide in guides_info.keys() if is_guide_available(day, shift, guide) and can_work_more(guide)]
+            if available_guides:
+                # Specific conditions for each guide
+                if shift == "rfbb" and schedule[day][shift]["guide1"] is None:
+                    # Amauri can only work in rfbb guide 1
+                    if "amauri" in available_guides:
+                        guide1 = "amauri"
+                        available_guides.remove("amauri")
+                        guide2 = random.choice(available_guides)
+                        schedule[day][shift]["guide1"] = guide1
+                        schedule[day][shift]["guide2"] = guide2
+                elif shift == "rfbb" and schedule[day][shift]["guide1"] == "amauri":
+                    # Nixshia can cover the other rfbb guide 1 shift
+                    guide1 = "nixshia"
+                    available_guides.remove("nixshia")
+                    guide2 = random.choice(available_guides)
+                    schedule[day][shift]["guide1"] = guide1
+                    schedule[day][shift]["guide2"] = guide2
+                elif shift == "rfbb" and schedule[day][shift]["guide1"] != "amauri":
+                    # Danny can work in rfbb other than guide 1
+                    available_guides.remove("danny")
+                    guide1 = "danny"
+                    guide2 = random.choice(available_guides)
+                    schedule[day][shift]["guide1"] = guide1
+                    schedule[day][shift]["guide2"] = guide2
+                elif shift != "rfbb" and schedule[day][shift]["guide2"] in ["jean", "kathy"]:
+                    # Jean and Kathy can only work as guide 2
+                    guide1 = random.choice(available_guides)
+                    available_guides.remove(guide1)
+                    guide2 = "jean" if "jean" in available_guides else "kathy"
+                    schedule[day][shift]["guide1"] = guide1
+                    schedule[day][shift]["guide2"] = guide2
+                else:
+                    guide1 = random.choice(available_guides)
+                    available_guides.remove(guide1)
+                    guide2 = random.choice(available_guides)
+                    schedule[day][shift]["guide1"] = guide1
+                    schedule[day][shift]["guide2"] = guide2
 
 # Print the schedule
 for day in days:
-    print(f"{day}:")
-    for shift, guides in schedule[day].items():
-        guide_1 = guides["Guide 1"] if guides["Guide 1"] else "None"
-        guide_2 = guides["Guide 2"] if guides["Guide 2"] else "None"
-        print(f"  {shift}: Guide 1: {guide_1}, Guide 2: {guide_2}")
+    print(f"{day}")
+    for shift in shifts:
+        print(f"{shift}:")
+        print(f"Guide 1: {schedule[day][shift]['guide1']}") 
+        print(f"Guide 2: {schedule[day][shift]['guide2']}")
+        print()
