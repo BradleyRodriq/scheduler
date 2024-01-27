@@ -20,7 +20,13 @@ schedule = {day: {shift: {"Guide 1": "", "Guide 2": ""}
 
 schedule["Sunday"] = {shift: {"Guide 1": "", "Guide 2": ""} for shift in shifts_sunday}
 
-availability = {guide: {day: True for day in days} for guide in guides}
+random_guide = random.choice(guides)
+guide_days[random_guide] += 1
+random_day = random.choice(days)
+random_shift = random.choice(shifts_weekdays)
+
+availability = {guide: {day: {shift: {"Guide 1": True, "Guide 2": True} for shift in shifts_weekdays} for day in days[:6]}for guide in guides}
+
 availability["Bradley"]["Friday"] = False
 availability["Amauri"]["Sunday"] = False
 availability["Rene"]["Wednesday"] = False
@@ -34,9 +40,16 @@ availability["Natalia"]["Thursday"] = False
 availability["Natalia"]["Friday"] = False
 
 for guide in ["Bradley", "Paola", "Jean", "Rene", "Danny", "Natalia", "Kathy", "Rene"]:
-    availability[guide]["RFBB"]["Guide 1"] = False
+    for day in days[:6]:
+        for shift in shifts_weekdays:
+            availability[guide][day]["RFBB"] = False
 for guide in ["Jean", "Kathy"]:
-    availability[guide]["RF Only 1"]["Guide 1"] = False
+    for day in days[:6]:
+        for shift in shifts_weekdays:
+            availability[guide][day]["RF Only 1"] = False
+for guide in ["Jean", "Kathy"]:
+    for shift in shifts_sunday:
+        availability[guide][day]["RF Only 1"] = False
 
 amauri_days = 0
 bradley_days = 0
@@ -47,11 +60,6 @@ kathy_days = 0
 nixshia_days = 0
 natalia_days = 0
 danny_days = 0
-
-random_guide = random.choice(guides)
-guide_days[random_guide] += 1
-random_day = random.choice(days)
-random_shift = random.choice(shifts_weekdays)
 
 for day in days:
     print(f"{day}:")
