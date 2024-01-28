@@ -59,8 +59,14 @@ availability["Natalia"]["Friday"] = False
 
 for guide in ["Bradley", "Paola", "Jean", "Rene", "Danny", "Natalia", "Kathy", "Rene"]:
     for day in days[-6:]:
-        for shift in shifts_weekdays:
-            availability[guide][day][shift]['Guide 1']
+        if shifts_weekdays[0] == availability[guide][day]:
+            availability[guide][day][shifts_weekdays[0]]['Guide 1'] = False
+
+for guide in ["Jean", "Kathy"]:
+    for day in ["Sunday"]:
+        if shifts_sunday[0] == availability[guide][day][shifts_sunday[0]]:
+            availability[guide][day][shifts_sunday[0]]['Guide 1'] = False
+
 
 for day in days:
     print(f"{day}:")
