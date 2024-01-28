@@ -1,63 +1,100 @@
 #!/usr/bin/python3
 
+import tkinter as tk
+from tkinter import messagebox, scrolledtext, StringVar
 import random
+import sys
 
-def initialize_schedule():
-    return {day: {shift: {"Guide 1": "", "Guide 2": ""} for shift in shifts_weekdays} for day in days[-6:]}
+def generate_schedule(shifts_per_day, days, guides, guide_availability):
+    shift_names = ["RFBB Guide 1", "RFBB Guide 2", "RFO 10:00 Guide 1", "RFO 10:00 Guide 2", "RFO 10:30 Guide 1", "RFO 10:30 Guide 2"]
+    schedule = {day[0] if isinstance(day, tuple) else day: {shift_names[i]: None for i in range(shifts_per_day)} for day in days}
 
-def initialize_sunday_schedule():
-    return {shift: {"Guide 1": "", "Guide 2": ""} for shift in shifts_sunday}
+    result = ""
 
-def initialize_availability():
-    return {guide: {day: {shift: {"Guide 1": "", "Guide 2": ""} for shift in shifts_weekdays + shifts_sunday} for day in days} for guide in guides}
-
-def mark_unavailable_days():
-    availability["Bradley"]["Friday"] = False
-    availability["Amauri"]["Sunday"] = False
-    availability["Rene"]["Wednesday"] = False
-    availability["Rene"]["Thursday"] = False
-    availability["Rene"]["Friday"] = False
-    availability["Rene"]["Saturday"] = False
-    availability["Natalia"]["Monday"] = False
-    availability["Natalia"]["Tuesday"] = False
-    availability["Natalia"]["Wednesday"] = False
-    availability["Natalia"]["Thursday"] = False
-    availability["Natalia"]["Friday"] = False
-
-def mark_shift_unavailable(guides_list, days_list, shift):
-    for guide in guides_list:
-        for day in days_list:
-            if shift == availability[guide][day]:
-                availability[guide][day][shift]['Guide 1'] = False
-
-def print_schedule():
     for day in days:
-        print(f"{day}:")
-        for shift, guides in schedule[day].items():
-            guide_1 = guides["Guide 1"] if guides["Guide 1"] else "None"
-            guide_2 = guides["Guide 2"] if guides["Guide 2"] else "None"
-            print(f"  {shift}: Guide 1: {guide_1}, Guide 2: {guide_2}")
-        print()
+        if isinstance(day, tuple):
+            day, num_shifts = day
+        else:
+            num_shifts = shifts_per_day
+        scheduled_guides = set()
+        for i in range(shifts_per_day):
+            shift_key = shift_names[i]
+            if day == "Sunday" and i in (0, 1):
+                continue
+            candidates = [guide for guide in guides
+                          if guide_availability[guide].get(day, False)
+                          and guide_availability[guide].get(shift_key, False)
+                          and guide_availability[guide]['max_shifts'] > 0
+                          and guide not in scheduled_guides]
+            if not candidates:
+                result += f"No guide available for Day: {day}, Shift: {shift_key}\n"
+                continue
+            selected_guide = random.choice(candidates)
+            schedule[day][shift_key] = selected_guide
+            guide_availability[selected_guide]['max_shifts'] -= 1
+            scheduled_guides.add(selected_guide)
 
-# Global variables
-days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-shifts_weekdays = ["RFBB", "RF1", "RF2"]
-shifts_sunday = ["RF1", "RF2"]
-guides = ["Amauri", "Paola", "Bradley", "Rene", "Jean", "Kathy", "Nixshia", "Natalia", "Danny"]
-availability = initialize_availability()
-schedule = initialize_schedule()
+    for day, shifts in schedule.items():
+        if isinstance(day, tuple):
+            day, num_shifts = day
+        result += f"{day}:\n"
+        for shift, guide in shifts.items():
+            if guide is not None:
+                result += f"  {shift}: {guide}\n"
+            else:
+                result += f"  {shift}: No guide available\n"
 
-def main():
-    random_guide = random.choice(guides)
-    mark_unavailable_days()
-    mark_shift_unavailable(["Bradley", "Paola", "Jean", "Rene", "Danny", "Natalia", "Kathy", "Rene"], days[-6:], shifts_weekdays[0])
-    mark_shift_unavailable(["Jean", "Kathy"], ["Sunday"], shifts_sunday[0])
-    
-    for day in days[-6:]:
-        schedule[day] = initialize_schedule()[day]
-    
-    for day in days:
-        print_schedule()
+    return result
 
-if __name__ == "__main__":
-    main()
+def on_generate_schedule():
+    try:
+        result_text.delete(1.0, tk.END)
+        # Make a deep copy of the guide_availability dictionary
+        guide_availability_copy = {guide: guide_info.copy() for guide, guide_info in guide_availability.items()}
+        randomized_schedule = generate_schedule(shifts_per_day, days_of_week, guides, guide_availability_copy)
+        result_text.delete(1.0, tk.END)  # Clear existing text
+        result_text.insert(tk.END, randomized_schedule)
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
+# Set up the Tkinter window
+window = tk.Tk()
+window.title("Schedule Generator")
+
+# Create a button to generate the schedule
+generate_button = tk.Button(window, text="Generate Schedule", command=on_generate_schedule)
+generate_button.pack(pady=10)
+
+# Create a ScrolledText widget to display the schedule and debugging information
+result_text = scrolledtext.ScrolledText(window, width=70, height=60, wrap=tk.WORD)
+result_text.pack(pady=10)
+
+# Define your shifts_per_day, days_of_week, guides, and guide_availability here...
+shifts_per_day = 6
+days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", ("Sunday", 4)]
+
+guides = ["Amauri", "Paola", "Bradley", "Rene", "Danny", "Jean", "Kathy", "Nixshia", "Natalia"]
+
+guide_availability = {
+    "Amauri": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
+               "RFBB Guide 1": True, "RFBB Guide 2": False, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": False, "RFO 10:30 Guide 1": False, "RFO 10:30 Guide 2": False, 'max_shifts': 4},
+    "Paola": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
+              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
+    "Bradley": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": False, "Saturday": True, "Sunday": True,
+                "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
+    "Rene": {"Monday": True, "Tuesday": True, "Wednesday": False, "Thursday": False, "Friday": False, "Saturday": False, "Sunday": True,
+             "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 3},
+    "Danny": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
+              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
+    "Jean": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
+             "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
+    "Kathy": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
+              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
+    "Nixshia": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
+                "RFBB Guide 1": True, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
+    "Natalia": {"Monday": False, "Tuesday": False, "Wednesday": False, "Thursday": False, "Friday": False, "Saturday": True, "Sunday": True,
+                 "RFBB Guide 1": False, "RFBB Guide 2": False, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": False, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 1}
+}
+
+# Start the Tkinter event loop
+window.mainloop()

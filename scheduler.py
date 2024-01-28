@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+import tkinter as tk
+from tkinter import messagebox, scrolledtext
 import random
 
 def generate_schedule(shifts_per_day, days, guides, guide_availability):
@@ -11,10 +13,9 @@ def generate_schedule(shifts_per_day, days, guides, guide_availability):
             day, num_shifts = day
         else:
             num_shifts = shifts_per_day
-        scheduled_guides = set()  # Keep track of guides already scheduled for this day
+        scheduled_guides = set()
         for i in range(shifts_per_day):
             shift_key = shift_names[i]
-            # Skip RFBB Guide 1 and RFBB Guide 2 on Sundays
             if day == "Sunday" and i in (0, 1):
                 continue
             candidates = [guide for guide in guides
@@ -69,3 +70,36 @@ for day, shifts in randomized_schedule.items():
             print(f"  {shift}: {guide}")
         else:
             print(f"  {shift}: No guide available")
+
+def on_generate_schedule():
+    try:
+        randomized_schedule = generate_schedule(shifts_per_day, days_of_week, guides, guide_availability)
+        result_text.delete(1.0, tk.END)  # Clear existing text
+        for day, shifts in randomized_schedule.items():
+            if isinstance(day, tuple):
+                day, num_shifts = day
+            result_text.insert(tk.END, f"{day}:\n")
+            for shift, guide in shifts.items():
+                if guide is not None:
+                    result_text.insert(tk.END, f"  {shift}: {guide}\n")
+                else:
+                    result_text.insert(tk.END, f"  {shift}: No guide available\n")
+    except Exception as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
+# Set up the Tkinter window
+window = tk.Tk()
+window.title("Schedule Generator")
+
+# Create a button to generate the schedule
+generate_button = tk.Button(window, text="Generate Schedule", command=on_generate_schedule)
+generate_button.pack(pady=10)
+
+# Create a ScrolledText widget to display the schedule and debugging information
+result_text = scrolledtext.ScrolledText(window, width=40, height=20, wrap=tk.WORD)
+result_text.pack(pady=10)
+
+# Define your shifts_per_day, days_of_week, guides, and guide_availability here...
+
+# Start the Tkinter event loop
+window.mainloop()
