@@ -12,6 +12,7 @@ guides = ["Amauri", "Paola", "Bradley", "Rene", "Jean",
 
 guide_max = {"Amauri": 4, "Paola": 5, "Bradley": 5, "Rene": 3, "Jean": 5,
             "Kathy": 5, "Nixshia": 5, "Natalia": 1, "Danny": 5}
+
 amauri_days = 0
 bradley_days = 0
 paola_days = 0
@@ -29,43 +30,8 @@ schedule = {day: {shift: {"Guide 1": "", "Guide 2": ""}
 
 schedule["Sunday"] = {shift: {"Guide 1": "", "Guide 2": ""} for shift in shifts_sunday}
 
-random_guide = random.choice(guides)
-guide_days[random_guide] += 1
-random_day = random.choice(days)
-random_shift = random.choice(shifts_weekdays)
-
-availability = {
-    guide: {
-        day: {
-            shift: {"Guide 1": "", "Guide 2": ""}
-            for shift in shifts_weekdays + shifts_sunday
-            }
-            for day in days
-        }
-        for guide in guides
-    }
-
-availability["Bradley"]["Friday"] = False
-availability["Amauri"]["Sunday"] = False
-availability["Rene"]["Wednesday"] = False
-availability["Rene"]["Thursday"] = False
-availability["Rene"]["Friday"] = False
-availability["Rene"]["Saturday"] = False
-availability["Natalia"]["Monday"] = False
-availability["Natalia"]["Tuesday"] = False
-availability["Natalia"]["Wednesday"] = False
-availability["Natalia"]["Thursday"] = False
-availability["Natalia"]["Friday"] = False
-
-for guide in ["Bradley", "Paola", "Jean", "Rene", "Danny", "Natalia", "Kathy", "Rene"]:
-    for day in days[-6:]:
-        if shifts_weekdays[0] == availability[guide][day]:
-            availability[guide][day][shifts_weekdays[0]]['Guide 1'] = False
-
-for guide in ["Jean", "Kathy"]:
-    for day in ["Sunday"]:
-        if shifts_sunday[0] == availability[guide][day][shifts_sunday[0]]:
-            availability[guide][day][shifts_sunday[0]]['Guide 1'] = False
+availability = {guide: {day: {shift: {"Guide 1": True, "Guide 2": True}for shift in shifts_weekdays + shifts_sunday
+            }for day in days}for guide in guides}
 
 
 for day in days:
