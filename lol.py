@@ -5,9 +5,12 @@ from tkinter import messagebox, scrolledtext, StringVar
 import random
 import sys
 
+
 def generate_schedule(shifts_per_day, days, guides, guide_availability):
-    shift_names = ["RFBB Guide 1", "RFBB Guide 2", "RFO 10:00 Guide 1", "RFO 10:00 Guide 2", "RFO 10:30 Guide 1", "RFO 10:30 Guide 2"]
-    schedule = {day[0] if isinstance(day, tuple) else day: {shift_names[i]: None for i in range(shifts_per_day)} for day in days}
+    shift_names = ["RFBB Guide 1", "RFBB Guide 2", "RFO 10:00 Guide 1",
+                   "RFO 10:00 Guide 2", "RFO 10:30 Guide 1", "RFO 10:30 Guide 2"]
+    schedule = {day[0] if isinstance(day, tuple) else day: {
+        shift_names[i]: None for i in range(shifts_per_day)} for day in days}
 
     result = ""
 
@@ -46,41 +49,49 @@ def generate_schedule(shifts_per_day, days, guides, guide_availability):
 
     return result
 
+
 def on_generate_schedule():
     try:
         result_text.delete(1.0, tk.END)
         # Make a deep copy of the guide_availability dictionary
-        guide_availability_copy = {guide: guide_info.copy() for guide, guide_info in guide_availability.items()}
-        randomized_schedule = generate_schedule(shifts_per_day, days_of_week, guides, guide_availability_copy)
+        guide_availability_copy = {guide: guide_info.copy(
+        ) for guide, guide_info in guide_availability.items()}
+        randomized_schedule = generate_schedule(
+            shifts_per_day, days_of_week, guides, guide_availability_copy)
         result_text.delete(1.0, tk.END)  # Clear existing text
         result_text.insert(tk.END, randomized_schedule)
     except Exception as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
+
 
 # Set up the Tkinter window
 window = tk.Tk()
 window.title("Schedule Generator")
 
 # Create a button to generate the schedule
-generate_button = tk.Button(window, text="Generate Schedule", command=on_generate_schedule)
+generate_button = tk.Button(
+    window, text="Generate Schedule", command=on_generate_schedule)
 generate_button.pack(pady=10)
 
 # Create a ScrolledText widget to display the schedule and debugging information
-result_text = scrolledtext.ScrolledText(window, width=70, height=60, wrap=tk.WORD)
+result_text = scrolledtext.ScrolledText(
+    window, width=70, height=60, wrap=tk.WORD)
 result_text.pack(pady=10)
 
 # Define your shifts_per_day, days_of_week, guides, and guide_availability here...
 shifts_per_day = 6
-days_of_week = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", ("Sunday", 4)]
+days_of_week = ["Monday", "Tuesday", "Wednesday",
+                "Thursday", "Friday", "Saturday", ("Sunday", 4)]
 
-guides = ["Amauri", "Paola", "Bradley", "Rene", "Danny", "Jean", "Kathy", "Nixshia", "Natalia"]
+guides = ["Amauri", "Paola", "Bradley", "Rene",
+          "Danny", "Jean", "Kathy", "Nixshia", "Natalia"]
 
 guide_availability = {
     "Amauri": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
                "RFBB Guide 1": True, "RFBB Guide 2": False, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": False, "RFO 10:30 Guide 1": False, "RFO 10:30 Guide 2": False, 'max_shifts': 4},
     "Paola": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
               "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
-    "Bradley": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": False, "Saturday": True, "Sunday": True,
+    "Bradley": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": False, "Friday": True, "Saturday": True, "Sunday": True,
                 "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
     "Rene": {"Monday": True, "Tuesday": True, "Wednesday": False, "Thursday": False, "Friday": False, "Saturday": False, "Sunday": True,
              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 3},
@@ -93,7 +104,7 @@ guide_availability = {
     "Nixshia": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
                 "RFBB Guide 1": True, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
     "Natalia": {"Monday": False, "Tuesday": False, "Wednesday": False, "Thursday": False, "Friday": False, "Saturday": True, "Sunday": True,
-                 "RFBB Guide 1": False, "RFBB Guide 2": False, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": False, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 1}
+                "RFBB Guide 1": False, "RFBB Guide 2": False, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": False, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 1}
 }
 
 # Start the Tkinter event loop
