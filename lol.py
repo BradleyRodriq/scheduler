@@ -53,7 +53,6 @@ def generate_schedule(shifts_per_day, days, guides, guide_availability):
 def on_generate_schedule():
     try:
         result_text.delete(1.0, tk.END)
-        # Make a deep copy of the guide_availability dictionary
         guide_availability_copy = {guide: guide_info.copy(
         ) for guide, guide_info in guide_availability.items()}
         randomized_schedule = generate_schedule(
@@ -64,21 +63,17 @@ def on_generate_schedule():
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
 
-# Set up the Tkinter window
 window = tk.Tk()
 window.title("Schedule Generator")
 
-# Create a button to generate the schedule
 generate_button = tk.Button(
     window, text="Generate Schedule", command=on_generate_schedule)
 generate_button.pack(pady=10)
 
-# Create a ScrolledText widget to display the schedule and debugging information
 result_text = scrolledtext.ScrolledText(
-    window, width=70, height=60, wrap=tk.WORD)
+    window, width=70, height=40, wrap=tk.WORD)
 result_text.pack(pady=10)
 
-# Define your shifts_per_day, days_of_week, guides, and guide_availability here...
 shifts_per_day = 6
 days_of_week = ["Monday", "Tuesday", "Wednesday",
                 "Thursday", "Friday", "Saturday", ("Sunday", 4)]
@@ -107,5 +102,5 @@ guide_availability = {
                 "RFBB Guide 1": False, "RFBB Guide 2": False, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": False, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 1}
 }
 
-# Start the Tkinter event loop
+
 window.mainloop()
