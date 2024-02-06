@@ -71,7 +71,7 @@ generate_button = tk.Button(
 generate_button.pack(pady=10)
 
 result_text = scrolledtext.ScrolledText(
-    window, width=70, height=40, wrap=tk.WORD)
+    window, width=70, height=70, wrap=tk.WORD)
 result_text.pack(pady=10)
 
 shifts_per_day = 6
@@ -95,7 +95,7 @@ guide_availability = {
     "Jean": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
     "Kathy": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
-              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
+              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 3},
     "Nixshia": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
                 "RFBB Guide 1": True, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
     "Natalia": {"Monday": False, "Tuesday": False, "Wednesday": False, "Thursday": False, "Friday": False, "Saturday": True, "Sunday": True,
