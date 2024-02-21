@@ -94,7 +94,7 @@ guide_availability = {
               "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
     "Jean": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
              "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": False, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
-    "Kathy": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
+    "Kathy": {"Monday": False, "Tuesday": False, "Wednesday": False, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
               "RFBB Guide 1": False, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 3},
     "Nixshia": {"Monday": True, "Tuesday": True, "Wednesday": True, "Thursday": True, "Friday": True, "Saturday": True, "Sunday": True,
                 "RFBB Guide 1": True, "RFBB Guide 2": True, "RFO 10:00 Guide 1": True, "RFO 10:00 Guide 2": True, "RFO 10:30 Guide 1": True, "RFO 10:30 Guide 2": True, 'max_shifts': 5},
